@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="googlebot" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1">    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>queryStringEditor by Victornpb</title>
 
     <style type="text/css">
@@ -35,6 +36,9 @@
         td:nth-child(3) {
             width: 1%;
         }
+        td:nth-child(4) {
+            width: 1%;
+        }
 
         td {
             padding: 3px;
@@ -51,6 +55,11 @@
 
         [name="val"] {
             font-family: monospace;
+        }
+
+        footer{
+            text-align: center;
+            font-size: xx-small;
         }
     </style>
     <script type="text/javascript" src="https://unpkg.com/vue@2.5.14/dist/vue.js"></script>
@@ -79,7 +88,9 @@
                         <input type="text" v-model="p.value" name="val">
                     </td>
                     <td>
-                        <label><input type="checkbox" v-model="p.encode"></label>
+                        <label>
+                            <input type="checkbox" v-model="p.encode">
+                        </label>
                     </td>
                     <td>
                         <button @click="remove(p)">Remove</button>
@@ -89,67 +100,80 @@
         </table>
         <button @click="add">Add parameter</button>
         <hr>
-        <h3>Query string</h3>
+        <h3>Query string <button @click="disassembly">Disassembly</button></h3>
         <textarea cols="80" rows="10" v-model="userString"></textarea>
-        <br>
-        <button @click="queryString=userString">Disassembly</button>
     </div>
 
+    <footer>
+        victornpb (2018-03-10)
+    </footer>
+
     <script type="text/javascript">
-        window.onload = function() {
-                var app = new Vue({
-                    el: template,
-                    data: {
+        window.onload = function () {
+            var app = new Vue({
+                el: template,
+                data: function(){
+                    return {
+                        userString: String(location.hash).substr(1) || 'foo=hello&bar=world',
                         list: [],
-                        userString: ''
+                    };
+                },
+                methods: {
+                    add() {
+                        this.list.push({
+                            name: `parameter${this.list.length + 1}`,
+                            value: `value${this.list.length + 1}`,
+                            encode: true,
+                        });
                     },
-                    methods: {
-                        add() {
-                            this.list.push({
-                                name: `parameter${this.list.length+1}`,
-                                value: `value${this.list.length+1}`,
-                                encode: true,
-                            });
+                    remove(item) {
+                        this.list.splice(this.list.indexOf(item), 1);
+                    },
+                    disassembly(){
+                        this.queryString = this.userString;
+                    }
+                },
+                watch: {
+                    queryString(newV, oldV) {
+                        this.userString = newV;
+                        location.hash = newV;
+                    }
+                },
+                computed: {
+                    queryString: {
+                        get() {
+                            return this.list.map(p => {
+                                return `${encodeURIComponent(p.name)}=${p.encode ? encodeURIComponent(p.value) : p.value}`;
+                            }).join('&');
                         },
-                        remove(item) {
-                            this.list.splice(this.list.indexOf(item), 1);
-                        }
-                    },
-                    watch: {
-                        queryString(newV, oldV) {
-                            this.userString = newV;
-                        }
-                    },
-                    computed: {
-                        queryString: {
-                            get() {
-                                return this.list.map(p => {
-                                    return `${encodeURIComponent(p.name)}=${p.encode? encodeURIComponent(p.value):p.value}`;
-                                }).join('&');
-                            },
-                            set(str) {
+                        set(str) {
 
-                                var list = [];
+                            var list = [];
 
-                                str.split('&').forEach(p => {
-                                    var kv = p.split('=');
-                                    var name = decodeURIComponent(kv[0]);
-                                    var value = decodeURIComponent(kv[1]);
-                                    if (kv[0] !== undefined && kv[1] !== undefined) {
-                                        list.push({
-                                            name,
-                                            value
-                                        });
-                                    }
-                                });
+                            str.split('&').forEach(p => {
+                                var kv = p.split('=');
+                                var name = decodeURIComponent(kv[0]);
+                                var value = decodeURIComponent(kv[1]);
+                                if (kv[0] !== undefined && kv[1] !== undefined) {
+                                    list.push({
+                                        name,
+                                        value,
+                                        encode: kv[1].indexOf('%')>-1
+                                    });
+                                }
+                            });
 
-                                this.list = list;
-                            }
+                            this.list = list;
                         }
                     }
-                });
+                }
+            });
+
+            app.disassembly();
+        };
     </script>
 
 
 </body>
+
 </html>
