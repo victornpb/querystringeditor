@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue.js"></script>
+
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            font: caption;
+            color: WindowText;
+            background-color: Window;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        td:nth-child(1) {
+            width: 20%;
+        }
+
+        /* td:nth-child(2){
+  width:1%
+} */
+
+        td:nth-child(3) {
+            width: 1%;
+        }
+
+        td {
+            padding: 3px;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        textarea {
+            width: 100%;
+            font-family: monospace;
+        }
+
+        [name="val"] {
+            font-family: monospace;
+        }
+    </style>
+
+    <title>queryStringEditor by Victornpb</title>
+
+    <script type="text/javascript">
+        window.onload = function() {
+                var app = new Vue({
+                    el: template,
+                    data: {
+                        list: [],
+                        userString: ''
+                    },
+                    methods: {
+                        add() {
+                            this.list.push({
+                                name: `parameter${this.list.length+1}`,
+                                value: `value${this.list.length+1}`,
+                                encode: true,
+                            });
+                        },
+                        remove(item) {
+                            this.list.splice(this.list.indexOf(item), 1);
+                        }
+                    },
+                    watch: {
+                        queryString(newV, oldV) {
+                            this.userString = newV;
+                        }
+                    },
+                    computed: {
+                        queryString: {
+                            get() {
+                                return this.list.map(p => {
+                                    return `${encodeURIComponent(p.name)}=${p.encode? encodeURIComponent(p.value):p.value}`;
+                                }).join('&');
+                            },
+                            set(str) {
+
+                                var list = [];
+
+                                str.split('&').forEach(p => {
+                                    var kv = p.split('=');
+                                    var name = decodeURIComponent(kv[0]);
+                                    var value = decodeURIComponent(kv[1]);
+                                    if (kv[0] !== undefined && kv[1] !== undefined) {
+                                        list.push({
+                                            name,
+                                            value
+                                        });
+                                    }
+                                });
+
+                                this.list = list;
+                            }
+                        }
+                    }
+                });
+    </script>
+
+
+</head>
+
+<body>
+    <h1>QueryString Editor 0.1</h1>
+
+    <div id="template">
+        <h3>Parameters:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>encode</th>
+                    <th>remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="p in list">
+                    <td>
+                        <input type="text" v-model="p.name" name="param">
+                    </td>
+                    <td>
+                        <input type="text" v-model="p.value" name="val">
+                    </td>
+                    <td>
+                        <label><input type="checkbox" v-model="p.encode"></label>
+                    </td>
+                    <td>
+                        <button @click="remove(p)">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button @click="add">Add parameter</button>
+        <hr>
+        <h3>Query string</h3>
+        <textarea cols="80" rows="10" v-model="userString"></textarea>
+        <br>
+        <button @click="queryString=userString">Disassembly</button>
+    </div>
+
+</body>
+</html>
