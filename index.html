@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="googlebot" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/vue/2.2.1/vue.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">    
+    <title>queryStringEditor by Victornpb</title>
 
     <style type="text/css">
         * {
@@ -31,8 +29,8 @@
         }
 
         /* td:nth-child(2){
-  width:1%
-} */
+          width:1%
+        } */
 
         td:nth-child(3) {
             width: 1%;
@@ -55,8 +53,47 @@
             font-family: monospace;
         }
     </style>
+    <script type="text/javascript" src="https://unpkg.com/vue@2.5.14/dist/vue.js"></script>
+</head>
 
-    <title>queryStringEditor by Victornpb</title>
+<body>
+    <h1>QueryString Editor 0.1</h1>
+
+    <div id="template">
+        <h3>Parameters:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>encode</th>
+                    <th>remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="p in list">
+                    <td>
+                        <input type="text" v-model="p.name" name="param">
+                    </td>
+                    <td>
+                        <input type="text" v-model="p.value" name="val">
+                    </td>
+                    <td>
+                        <label><input type="checkbox" v-model="p.encode"></label>
+                    </td>
+                    <td>
+                        <button @click="remove(p)">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button @click="add">Add parameter</button>
+        <hr>
+        <h3>Query string</h3>
+        <textarea cols="80" rows="10" v-model="userString"></textarea>
+        <br>
+        <button @click="queryString=userString">Disassembly</button>
+    </div>
 
     <script type="text/javascript">
         window.onload = function() {
@@ -113,47 +150,6 @@
                 });
     </script>
 
-
-</head>
-
-<body>
-    <h1>QueryString Editor 0.1</h1>
-
-    <div id="template">
-        <h3>Parameters:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Parameter</th>
-                    <th>Value</th>
-                    <th>encode</th>
-                    <th>remove</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="p in list">
-                    <td>
-                        <input type="text" v-model="p.name" name="param">
-                    </td>
-                    <td>
-                        <input type="text" v-model="p.value" name="val">
-                    </td>
-                    <td>
-                        <label><input type="checkbox" v-model="p.encode"></label>
-                    </td>
-                    <td>
-                        <button @click="remove(p)">Remove</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <button @click="add">Add parameter</button>
-        <hr>
-        <h3>Query string</h3>
-        <textarea cols="80" rows="10" v-model="userString"></textarea>
-        <br>
-        <button @click="queryString=userString">Disassembly</button>
-    </div>
 
 </body>
 </html>
